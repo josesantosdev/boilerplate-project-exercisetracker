@@ -18,15 +18,28 @@ module.exports.createUser = async (req, res) => {
 
 module.exports.addExercise = async (req, res) => {
     try {
-        const exercice = new Exercice(req.body);
+        const userId = req.params._id;
+        const user = await User.findById(userId);
+        const { description, duration, date } = req.body;
+
+        const exercice = new Exercice({
+            username: user.username,
+            description,
+            duration,
+            date,
+            _id: user._id,
+
+        });
+
         await exercice.save();
+
         res.status(201).json({
-            message: 'Exercice created successfully',
+            message: 'Exercise added successfully',
             exercice
         });
-    } catch (error) {
-        res.status(400).json({
-            message: error.message
-        });
+
+    } catch (err) {
+        res.status(500).json({ message: 'Error adding exercise', error: err.message });
+
     }
 };
